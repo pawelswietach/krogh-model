@@ -46,7 +46,7 @@ if st.button("Solve"):
         CA=CA,
         pHi0=pHi0,
         NHE=NHE,
-        Nx=int(n_points)
+        Nx=int(n_points),
         L=L
     )
     x = out["x_um"]
