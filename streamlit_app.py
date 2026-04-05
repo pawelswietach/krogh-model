@@ -15,18 +15,18 @@ st.title("Cancer tissue advection-diffusion-reaction model for pH and oxygen dyn
 st.markdown('[Using Mathematical Modeling of Tumor Metabolism to Predict the Magnitude, Composition, and Hypoxic Interactions of Microenvironment Acidosis](https://onlinelibrary.wiley.com/doi/10.1002/bies.70101)')
 
 st.sidebar.header("Inputs")
-
+L = st.sidebar.number_input("Tissue length (um)", value=2000.0)
 R = st.sidebar.number_input("Radius (um)", value=200.0)
 RR = st.sidebar.number_input("Respiratory rate (mM/min)", value=1.0)
 GR = st.sidebar.number_input("Fermentative rate (mM/min)", value=1.0)
 ve = st.sidebar.number_input("Extracellular volume fraction", value=0.2)
 
-startO2 = st.sidebar.number_input("Bath [O2] (mM)", value=0.13)
-startCO2 = st.sidebar.number_input("Bath [CO2] (mM)", value=1.2)
-startHCO3 = st.sidebar.number_input("Bath [HCO3-] (mM)", value=24.0)
-startGlucose = st.sidebar.number_input("Bath [Glucose] (mM)", value=5.0)
+startO2 = st.sidebar.number_input("Blood [O2] (mM)", value=0.13)
+startCO2 = st.sidebar.number_input("Blood [CO2] (mM)", value=1.2)
+startHCO3 = st.sidebar.number_input("Blood [HCO3-] (mM)", value=24.0)
+startGlucose = st.sidebar.number_input("Blood [Glucose] (mM)", value=5.0)
 
-CA = st.sidebar.number_input("Carbonic anhydrase activity", value=100.0)
+CA = st.sidebar.number_input("Tissue CA activity", value=100.0)
 pHi0 = st.sidebar.number_input("Initial intracellular pH", value=7.2)
 
 NHE = st.sidebar.radio("NHE activity", ["yes","no"])
@@ -47,6 +47,7 @@ if st.button("Solve"):
         pHi0=pHi0,
         NHE=NHE,
         Nx=int(n_points)
+        L=L
     )
     x = out["x_um"]
     depth = R - x
@@ -63,12 +64,15 @@ if st.button("Solve"):
 
     ax[0].plot(out["x_um"], out["O2_mM"])
     ax[0].set_title("O2")
+    ax[0].set_xlabel("Axial distance (um)")
  
     ax[1].plot(out["x_um"], out["CO2_mM"])
     ax[1].set_title("CO2")
+    ax[1].set_xlabel("Axial distance (um)")
 
     ax[2].plot(out["x_um"], out["pH"])
     ax[2].set_title("pH")
+    ax[2].set_xlabel("Axial distance (um)")
 
     plt.subplots_adjust(hspace=0.5)
 

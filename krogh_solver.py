@@ -13,11 +13,12 @@ def krogh_solver(
     CA,
     pHi0,
     NHE,
-    Nx
+    Nx,
+    L
 ):
     # --- geometry ---
     Rcap = 5
-    L = 2000
+    L = float(L)
     v = 1000
 
     x = np.linspace(0, L, Nx)
