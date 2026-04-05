@@ -49,32 +49,88 @@ if st.button("Solve"):
         Nx=int(n_points),
         L=L
     )
-    x = out["x_um"]
-    depth = R - x
 
+    x = out["x_um"]
+
+    # -------------------------------
+    # Data table (clean + consistent)
+    # -------------------------------
     df = pd.DataFrame({
         "x (um)": x,
-        "O2 (mM)": out["O2_mM"],
-        "CO2 (mM)": out["CO2_mM"],
-        "HCO3 (mM)": out["HCO3_mM"],
-        "pH": out["pH"],
+        "Blood O2": out["O2_b"],
+        "Blood CO2": out["CO2_b"],
+        "Blood HCO3": out["HCO3_b"],
+        "Blood pH": out["pHb"],
+        "Blood Lac": out["Lac_b"],
+        "Blood Glu": out["Glu_b"],
+
+        "Tissue O2": out["O2_t"],
+        "Tissue CO2": out["CO2_t"],
+        "HCO3e": out["HCO3_e"],
+        "HCO3i": out["HCO3_i"],
+        "pHe": out["pHe"],
+        "pHi": out["pHi"],
+        "Lace": out["Lac_e"],
+        "Laci": out["Lac_i"],
+        "HLac": out["HLac_t"],
+        "Glu_t": out["Glu_t"]
     })
 
-    fig, ax = plt.subplots(1,3, figsize=(12,4))
+    # -------------------------------
+    # MATLAB-style multi-panel plots
+    # -------------------------------
+    fig, axs = plt.subplots(3,4, figsize=(18,12))
 
-    ax[0].plot(out["x_um"], out["O2_mM"])
-    ax[0].set_title("O2")
-    ax[0].set_xlabel("Axial distance (um)")
- 
-    ax[1].plot(out["x_um"], out["CO2_mM"])
-    ax[1].set_title("CO2")
-    ax[1].set_xlabel("Axial distance (um)")
+    # --- BLOOD ---
+    axs[0,0].plot(x, out["O2_b"]); axs[0,0].set_title("Blood O2 (mM)")
+    axs[0,1].plot(x, out["CO2_b"]); axs[0,1].set_title("Blood CO2 (mM)")
+    axs[0,2].plot(x, out["HCO3_b"]); axs[0,2].set_title("Blood HCO3 (mM)")
+    axs[0,3].plot(x, out["pHb"]); axs[0,3].set_title("Blood pH")
 
-    ax[2].plot(out["x_um"], out["pH"])
-    ax[2].set_title("pH")
-    ax[2].set_xlabel("Axial distance (um)")
+    # --- TISSUE OXYGEN + CO2 ---
+    axs[1,0].plot(x, out["O2_t"]); axs[1,0].set_title("Tissue O2 (mM)")
+    axs[1,1].plot(x, out["CO2_t"]); axs[1,1].set_title("Tissue CO2 (mM)")
 
-    plt.subplots_adjust(hspace=0.5)
+    # --- BICARBONATE ---
+    axs[1,2].plot(x, out["HCO3_e"], label="Extracellular")
+    axs[1,2].plot(x, out["HCO3_i"], '--', label="Intracellular")
+    axs[1,2].set_title("HCO3 (mM)")
+    axs[1,2].legend()
+
+    # --- pH ---
+    axs[1,3].plot(x, out["pHe"], label="Extracellular")
+    axs[1,3].plot(x, out["pHi"], '--', label="Intracellular")
+    axs[1,3].set_title("pH")
+    axs[1,3].legend()
+
+    # --- LACTATE ---
+    axs[2,0].plot(x, out["Lac_e"], label="Extracellular")
+    axs[2,0].plot(x, out["Lac_i"], '--', label="Intracellular")
+    axs[2,0].set_title("Lactate (mM)")
+    axs[2,0].legend()
+
+    # --- HLac ---
+    axs[2,1].plot(x, out["HLac"]); axs[2,1].set_title("HLac (mM)")
+
+    # --- GLUCOSE ---
+    axs[2,2].plot(x, out["Glu_b"], label="Blood")
+    axs[2,2].plot(x, out["Glu_t"], '--', label="Tissue")
+    axs[2,2].set_title("Glucose (mM)")
+    axs[2,2].legend()
+
+    # --- pH vs O2 ---
+    axs[2,3].plot(out["O2_t"], out["pHe"], label="Extracellular")
+    axs[2,3].plot(out["O2_t"], out["pHi"], '--', label="Intracellular")
+    axs[2,3].set_title("pH vs O2")
+    axs[2,3].set_xlabel("O2 (mM)")
+    axs[2,3].legend()
+
+    # formatting
+    for ax in axs.flat:
+        ax.set_xlabel("x (um)")
+        ax.grid(True)
+
+    plt.tight_layout()
 
     st.pyplot(fig, use_container_width=True)
 
