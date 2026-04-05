@@ -10,7 +10,7 @@ col1, col2 = st.columns([1,1])
 with col1:
     st.image("image.png")
 
-st.title("Cancer spheroid diffusion-reaction model for pH and oxygen dynamics")
+st.title("Cancer tissue advection-diffusion-reaction model for pH and oxygen dynamics")
 
 st.markdown('[Using Mathematical Modeling of Tumor Metabolism to Predict the Magnitude, Composition, and Hypoxic Interactions of Microenvironment Acidosis](https://onlinelibrary.wiley.com/doi/10.1002/bies.70101)')
 

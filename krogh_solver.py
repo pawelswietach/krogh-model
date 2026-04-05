@@ -24,8 +24,7 @@ def krogh_solver(
     dx = x[1] - x[0]
 
     # --- parameters ---
-    ve = ve
-    ve = 1 - vi
+    vi = 1 - ve
 
     CA_bld = CA
     CA_tis = CA
