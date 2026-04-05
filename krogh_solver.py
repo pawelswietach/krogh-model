@@ -1,8 +1,20 @@
 import numpy as np
 from scipy.integrate import solve_ivp
 
-def krogh_solver(Rtis=200, RR=1, GR=1, NHE="yes", Nx=50):
-
+def krogh_solver(
+    Rtis,
+    RR,
+    GR,
+    ve,
+    startO2,
+    startCO2,
+    startHCO3,
+    startGlucose,
+    CA,
+    pHi0,
+    NHE,
+    Nx
+):
     # --- geometry ---
     Rcap = 5
     L = 2000
@@ -12,11 +24,11 @@ def krogh_solver(Rtis=200, RR=1, GR=1, NHE="yes", Nx=50):
     dx = x[1] - x[0]
 
     # --- parameters ---
-    vi = 0.75
+    ve = ve
     ve = 1 - vi
 
-    CA_bld = 1000
-    CA_tis = 100
+    CA_bld = CA
+    CA_tis = CA
 
     kh = 0.14
     kr = kh / (10**-6.1)
@@ -35,14 +47,13 @@ def krogh_solver(Rtis=200, RR=1, GR=1, NHE="yes", Nx=50):
 
     # --- inlet ---
     pH_b = 7.4
-    O2_b = 0.13/1000
-    CO2_b = 1.2/1000
-    H_b = 10**(-pH_b)
-    HCO3_b = 10**(pH_b-6.1)*CO2_b
-
+    O2_b = startO2 / 1000
+    CO2_b = startCO2 / 1000
+    HCO3_b = startHCO3 / 1000
+    Glu_b = startGlucose / 1000
     Lac_b = 0
     HLac_b = 0
-    Glu_b = 5/1000
+    
 
     B_in = np.array([O2_b, CO2_b, HCO3_b, H_b, Lac_b, HLac_b, Glu_b])
 

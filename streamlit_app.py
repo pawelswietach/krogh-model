@@ -34,8 +34,20 @@ n_points = st.sidebar.number_input("Mesh points", value=20)
 
 if st.button("Solve"):
 
-    out = krogh_solver(Rtis=R, RR=RR, GR=GR, Nx=int(n_points))
-
+    out = krogh_solver(
+        Rtis=R,
+        RR=RR,
+        GR=GR,
+        ve=ve,
+        startO2=startO2,
+        startCO2=startCO2,
+        startHCO3=startHCO3,
+        startGlucose=startGlucose,
+        CA=CA,
+        pHi0=pHi0,
+        NHE=NHE,
+        Nx=int(n_points)
+    )
     x = out["x_um"]
     depth = R - x
 
