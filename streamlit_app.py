@@ -40,30 +40,23 @@ if st.button("Solve"):
     depth = R - x
 
     df = pd.DataFrame({
-        "Radial depth (um)": depth,
-        "O2": out["O2_mM"],
-        "Glucose": out["Glu_mM"],
-        "CO2": out["CO2_mM"],
-        "Lactic acid": out["HLac_mM"],
-        "HCO3e": out["HCO3e_mM"],
-        "HCO3i": out["HCO3i_mM"],
-        "pHe": out["pHe"],
-        "pHi": out["pHi"],
-        "Lace": out["Lace_mM"],
-        "Laci": out["Laci_mM"],
+        "x (um)": x,
+        "O2 (mM)": out["O2_mM"],
+        "CO2 (mM)": out["CO2_mM"],
+        "HCO3 (mM)": out["HCO3_mM"],
+        "pH": out["pH"],
     })
 
-   fig, ax = plt.subplots(1,3, figsize=(12,4))
+    fig, ax = plt.subplots(1,3, figsize=(12,4))
 
-   ax[0].plot(out["x_um"], out["O2_mM"])
-   ax[0].set_title("O2")
+    ax[0].plot(out["x_um"], out["O2_mM"])
+    ax[0].set_title("O2")
+ 
+    ax[1].plot(out["x_um"], out["CO2_mM"])
+    ax[1].set_title("CO2")
 
-   ax[1].plot(out["x_um"], out["CO2_mM"])
-   ax[1].set_title("CO2")
-
-   ax[2].plot(out["x_um"], out["pH"])
-   ax[2].set_title("pH")
-
+    ax[2].plot(out["x_um"], out["pH"])
+    ax[2].set_title("pH")
 
     plt.subplots_adjust(hspace=0.5)
 
