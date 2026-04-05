@@ -52,7 +52,8 @@ def krogh_solver(
     Glu_b = startGlucose / 1000
     Lac_b = 0
     HLac_b = 0
-    
+    pH_b = 7.4  # or make this a GUI input later
+    H_b = 10**(-pH_b)
 
     B_in = np.array([O2_b, CO2_b, HCO3_b, H_b, Lac_b, HLac_b, Glu_b])
 
