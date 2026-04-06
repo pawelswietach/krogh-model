@@ -21,7 +21,7 @@ st.sidebar.header("Inputs")
 L = st.sidebar.number_input("Tissue length (µm)", value=2000.0)
 R = st.sidebar.number_input("Tissue radius (µm)", value=200.0)
 RR = st.sidebar.number_input("Respiratory rate (mM/min)", value=0.1)
-GR = st.sidebar.number_input("Fermentative rate (mM/min)", value=0.5)
+GR = st.sidebar.number_input("Fermentative rate (mM/min)", value=0.1)
 ve = st.sidebar.number_input("Extracellular fraction", value=0.25)
 
 startO2 = st.sidebar.number_input("Blood O2 (mM)", value=0.13)
@@ -33,7 +33,7 @@ CA = st.sidebar.number_input("Tissue CA activity", value=100.0)
 pHi0 = st.sidebar.number_input("Initial pHi", value=7.2)
 
 NHE = 1.0 if st.sidebar.radio("NHE", ["yes","no"])=="yes" else 0.0
-Nx = int(st.sidebar.number_input("Mesh points", value=20))
+Nx = int(st.sidebar.number_input("Mesh points", value=10))
 
 if st.button("Solve"):
 
@@ -88,10 +88,10 @@ if st.button("Solve"):
     axs[1,2].legend()
 
     # pH vs O2
-    axs[1,3].plot(out["O2_t"],out["pHi"],'b', label="Extracellular")
-    axs[1,3].plot(out["O2_t"],out["pHe"],color='orange', label="Intracellular")
-    axs[1,3].set_title("pH vs O2")
-    axs[1,3].set_xlabel("O2 (mM)")
+    axs[1,3].plot(out["O2_b"],out["pHi"],'b', label="Extracellular")
+    axs[1,3].plot(out["O2_b"],out["pHe"],color='orange', label="Intracellular")
+    axs[1,3].set_title("pH vs blood O2")
+    axs[1,3].set_xlabel("Blood O2 (mM)")
     axs[1,3].legend()
 
     for i, ax in enumerate(axs.flat):
