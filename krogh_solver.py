@@ -79,6 +79,7 @@ def krogh_solver(Rtis, RR, GR, ve,
     U0[:,16] = 0
 
     y0 = U0.flatten()
+    last_rhs = [None]
 
     def rhs(t, y):
         U = y.reshape(Nx,17)
@@ -156,10 +157,14 @@ def krogh_solver(Rtis, RR, GR, ve,
 
         dUdt=np.hstack([s_b,s_t])/c
         dUdt[0,0:7]=0
+        last_rhs[0] = np.max(np.abs(dUdt))
         return dUdt.flatten()
 
     def steady_event(t,y):
-        return np.max(np.abs(rhs(t,y))) - 1e-7
+        val = last_rhs[0]
+        if val is None:
+            return 1.0
+        return val - 1e-7
 
     steady_event.terminal=True
     steady_event.direction=-1
@@ -171,8 +176,8 @@ def krogh_solver(Rtis, RR, GR, ve,
         atol[i*17 + 10] = 1e-8   # extracellular H+
         atol[i*17 + 15] = 1e-8   # intracellular H+
 
-    sol=solve_ivp(rhs,[0,20000],y0,method="BDF",
-                  atol=atol,rtol=1e-5,max_step=200,events=steady_event)
+    sol=solve_ivp(rhs,[0,5000],y0,method="BDF",
+                  atol=atol,rtol=1e-4,max_step=500,events=steady_event)
 
     U=sol.y[:,-1].reshape(Nx,17)
 
