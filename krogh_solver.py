@@ -162,8 +162,19 @@ def krogh_solver(Rtis, RR, GR, ve,
     steady_event.terminal=True
     steady_event.direction=-1
 
+    atol = np.ones(17*Nx) * 1e-6   # default
+
+    for i in range(Nx):
+        atol[i*17 + 3]  = 1e-12   # blood H+
+        atol[i*17 + 10] = 1e-12   # extracellular H+
+        atol[i*17 + 15] = 1e-12   # intracellular H+
+
+        atol[i*17 + 4]  = 1e-7    # Lac_b
+        atol[i*17 + 11] = 1e-7    # Lac_e
+        atol[i*17 + 16] = 1e-7    # Lac_i
+
     sol=solve_ivp(rhs,[0,20000],y0,method="BDF",
-                  atol=1e-8,rtol=1e-6,events=steady_event)
+                  atol=atol,rtol=1e-5,max_step=200,events=steady_event)
 
     U=sol.y[:,-1].reshape(Nx,17)
 
