@@ -90,29 +90,35 @@ def krogh_solver(Rtis, RR, GR, ve,
         O2_b, CO2_b, HCO3_b, H_b, Lac_b, HLac_b, Glu_b = B.T
         O2_t, CO2_t, HCO3_e, H_e, Lac_e, HLac_t, Glu_t, HCO3_i, H_i, Lac_i = T.T
 
+        O2eff   = np.maximum(O2_t, 0.0)
+        Glueff  = np.maximum(Glu_t, 0.0)
+        H_b_safe = np.maximum(H_b, 1e-12)
+        H_e_safe = np.maximum(H_e, 1e-12)
+        H_i_safe = np.maximum(H_i, 1e-12)
+
         dHb = HbO2_slope(O2_b, THb)
-        bufSlope = TBuf / (2.303 * np.maximum(H_b,1e-12))
+        bufSlope = TBuf / (2.303 * H_b_safe)
 
-        rCO2_b = CA*(kr*HCO3_b*H_b - kh*CO2_b)
-        rHLac_b = kb*Lac_b*H_b - kf*HLac_b
+        CAb=1000
+        rCO2_b = CAb*(kr*HCO3_b*H_b_safe - kh*CO2_b)
+        rHLac_b = kb*Lac_b*H_b_safe - kf*HLac_b
 
-        rCO2_e = CA*(kr*HCO3_e*H_e - kh*CO2_t)
-        rHLac_e = kb*Lac_e*H_e - kf*HLac_t
+        rCO2_e = CA*(kr*HCO3_e*H_e_safe - kh*CO2_t)
+        rHLac_e = kb*Lac_e*H_e_safe - kf*HLac_t
 
-        rCO2_i = CA*(kr*HCO3_i*H_i - kh*CO2_t)
-        rHLac_i = kb*Lac_i*H_i - kf*HLac_t
+        rCO2_i = CA*(kr*HCO3_i*H_i_safe - kh*CO2_t)
+        rHLac_i = kb*Lac_i*H_i_safe - kf*HLac_t
 
-        mmO2 = O2_t/(O2_t+KmO2)
-        mmG = Glu_t/(Glu_t+KgG)
-
-        mmH = (10**-7.1)**2.25/(np.maximum(H_i,1e-12)**2.25+(10**-7.1)**2.25)
+        mmO2 = O2eff/(O2eff + KmO2)
+        mmG  = Glueff/(Glueff + KgG)
+        mmH = (10**-7.1)**2.25 / (H_i_safe**2.25 + (10**-7.1)**2.25)
 
         Jresp = JR*mmG*mmO2
         Jglyc = JG*mmG*mmH
 
         Href=10**-7.2
         Knhe=10**-6.5
-        Jnhe=(NHE/1000/60)*(H_i**2/(H_i**2+Knhe**2)-Href**2/(Href**2+Knhe**2))
+        Jnhe=(NHE/1000/60)*(H_i_safe**2/(H_i_safe**2+Knhe**2)-Href**2/(Href**2+Knhe**2))
 
         s_b = np.zeros_like(B)
         s_t = np.zeros_like(T)
