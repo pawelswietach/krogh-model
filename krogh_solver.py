@@ -74,8 +74,11 @@ def krogh_solver(Rtis, RR, GR, ve,
     U0 = np.zeros((Nx,17))
     U0[:,0:7] = B_in
     U0[:,7:14] = B_in
-    U0[:,14] = startHCO3/1000
-    U0[:,15] = 10**(-pHi0)
+    CO2_i = startCO2 / 1000
+    H_i = 10**(-pHi0)
+    HCO3_i = CO2_i * 10**(pHi0 - 6.1)
+    U0[:,14] = HCO3_i
+    U0[:,15] = H_i
     U0[:,16] = 0
 
     y0 = U0.flatten()
