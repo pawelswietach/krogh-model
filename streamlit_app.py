@@ -1,99 +1,102 @@
+
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-from krogh_solver import krogh_solver
+from steady_state_model import diffusion_solver
 
 st.set_page_config(layout="wide")
 
-# Header
 col1, col2 = st.columns([1,1])
 with col1:
     st.image("image.png")
 
-st.title("Cancer tissue advection-diffusion-reaction model")
+st.title("Cancer spheroid diffusion-reaction model for pH and oxygen dynamics")
 
-st.markdown(
-    "[Mathematical Modeling of Tumor Metabolism](https://onlinelibrary.wiley.com/doi/10.1002/bies.70101)"
-)
+st.markdown('[Using Mathematical Modeling of Tumor Metabolism to Predict the Magnitude, Composition, and Hypoxic Interactions of Microenvironment Acidosis](https://onlinelibrary.wiley.com/doi/10.1002/bies.70101)')
 
-# Sidebar
 st.sidebar.header("Inputs")
 
-L = st.sidebar.number_input("Tissue length (um)", value=2000.0)
 R = st.sidebar.number_input("Radius (um)", value=200.0)
-RR = st.sidebar.number_input("Respiration rate", value=1.0)
-GR = st.sidebar.number_input("Glycolysis rate", value=1.0)
-ve = st.sidebar.number_input("Extracellular fraction", value=0.2)
+RR = st.sidebar.number_input("Respiratory rate (mM/min)", value=1.0)
+GR = st.sidebar.number_input("Fermentative rate (mM/min)", value=1.0)
+ve = st.sidebar.number_input("Extracellular volume fraction", value=0.2)
 
-startO2 = st.sidebar.number_input("O2", value=0.13)
-startCO2 = st.sidebar.number_input("CO2", value=1.2)
-startHCO3 = st.sidebar.number_input("HCO3", value=24.0)
-startGlucose = st.sidebar.number_input("Glucose", value=5.0)
+startO2 = st.sidebar.number_input("Bath [O2] (mM)", value=0.13)
+startCO2 = st.sidebar.number_input("Bath [CO2] (mM)", value=1.2)
+startHCO3 = st.sidebar.number_input("Bath [HCO3-] (mM)", value=24.0)
+startGlucose = st.sidebar.number_input("Bath [Glucose] (mM)", value=5.0)
 
-CA = st.sidebar.number_input("CA", value=100.0)
-pHi0 = st.sidebar.number_input("Initial pHi", value=7.2)
+CA = st.sidebar.number_input("Carbonic anhydrase activity", value=100.0)
+pHi0 = st.sidebar.number_input("Initial intracellular pH", value=7.2)
 
-NHE = 1.0 if st.sidebar.radio("NHE", ["yes","no"])=="yes" else 0.0
-Nx = int(st.sidebar.number_input("Mesh points", value=10))
+NHE = st.sidebar.radio("NHE activity", ["yes","no"])
+n_points = st.sidebar.number_input("Mesh points", value=20)
 
 if st.button("Solve"):
 
-    out = krogh_solver(R,RR,GR,ve,
-                       startO2,startCO2,startHCO3,startGlucose,
-                       CA,pHi0,NHE,Nx,L)
+    out = diffusion_solver(
+        R=R,RR=RR,GR=GR,ve=ve,
+        startO2=startO2,startCO2=startCO2,
+        startHCO3=startHCO3,startGlucose=startGlucose,
+        NHE=NHE,
+        CA=CA,
+        pHi0=pHi0,
+        n_points=int(n_points)
+    )
 
-    x = out["x"]
+    x = out["x_um"]
+    depth = R - x
 
-    fig, axs = plt.subplots(3,4, figsize=(18,12))
+    df = pd.DataFrame({
+        "Radial depth (um)": depth,
+        "O2": out["O2_mM"],
+        "Glucose": out["Glu_mM"],
+        "CO2": out["CO2_mM"],
+        "Lactic acid": out["HLac_mM"],
+        "HCO3e": out["HCO3e_mM"],
+        "HCO3i": out["HCO3i_mM"],
+        "pHe": out["pHe"],
+        "pHi": out["pHi"],
+        "Lace": out["Lace_mM"],
+        "Laci": out["Laci_mM"],
+    })
 
-    # TOP ROW
-    axs[0,0].plot(x,out["O2_b"],'r')
-    axs[0,0].plot(x,out["O2_t"],'k')
-    axs[0,0].set_title("O2")
+    fig, axs = plt.subplots(2,4,figsize=(18,10))
 
-    axs[0,1].plot(x,out["Glu_b"],'r')
-    axs[0,1].plot(x,out["Glu_t"],'k')
-    axs[0,1].set_title("Glucose")
+    axs[0,0].plot(depth,out["O2_mM"],'k'); axs[0,0].set_title("O2 (mM)")
+    axs[0,1].plot(depth,out["Glu_mM"],'k'); axs[0,1].set_title("Glucose (mM)")
+    axs[0,2].plot(depth,out["CO2_mM"],'k'); axs[0,2].set_title("CO2 (mM)")
+    axs[0,3].plot(depth,1000*out["HLac_mM"],'k'); axs[0,3].set_title("Lactic acid (µM)")
 
-    axs[0,2].plot(x,out["CO2_b"],'r')
-    axs[0,2].plot(x,out["CO2_t"],'k')
-    axs[0,2].set_title("CO2")
+    axs[1,0].plot(depth, out["HCO3e_mM"], 'r', label="Extracellular")
+    axs[1,0].plot(depth, out["HCO3i_mM"], 'b', label="Intracellular")
+    axs[1,0].set_title("Bicarbonate (mM)")
+    axs[1,0].legend()
 
-    axs[0,3].plot(x,out["HLac_b"],'r')
-    axs[0,3].plot(x,out["HLac_t"],'k')
-    axs[0,3].set_title("HLac")
-
-    # BOTTOM ROW
-    axs[1,0].plot(x,out["HCO3_b"],'r')
-    axs[1,0].plot(x,out["HCO3_i"],color='orange')
-    axs[1,0].plot(x,out["HCO3_e"],'b')
-    axs[1,0].set_title("HCO3")
-
-    axs[1,1].plot(x,out["pHb"],'r')
-    axs[1,1].plot(x,out["pHi"],color='orange')
-    axs[1,1].plot(x,out["pHe"],'b')
+    axs[1,1].plot(depth, out["pHe"], 'r', label="Extracellular")
+    axs[1,1].plot(depth, out["pHi"], 'b', label="Intracellular")
     axs[1,1].set_title("pH")
+    axs[1,1].legend()
 
-    axs[1,2].plot(x,out["Lac_b"],'r')
-    axs[1,2].plot(x,out["Lac_i"],color='orange')
-    axs[1,2].plot(x,out["Lac_e"],'b')
-    axs[1,2].set_title("Lactate")
+    axs[1,2].plot(depth, out["Lace_mM"], 'r', label="Extracellular")
+    axs[1,2].plot(depth, out["Laci_mM"], 'b', label="Intracellular")
+    axs[1,2].set_title("Lactate (mM)")
+    axs[1,2].legend()
 
-    # pH vs O2
-    axs[1,3].plot(out["O2_t"],out["pHe"],color='orange')
-    axs[1,3].plot(out["O2_t"],out["pHi"],'b')
+    axs[1,3].plot(out["O2_mM"], out["pHe"], 'r', label="Extracellular")
+    axs[1,3].plot(out["O2_mM"], out["pHi"], 'b', label="Intracellular")
     axs[1,3].set_title("pH vs O2")
+    axs[1,3].set_xlabel("O2 (mM)")
+    axs[1,3].legend()
 
-    # empty row
-    for j in range(4):
-        axs[2,j].axis('off')
+    for i, ax in enumerate(axs.flat):
+        if i != 7:
+            ax.set_xlabel("Radial depth (µm)")
 
-    for ax in axs.flat:
-        if ax.has_data():
-            ax.set_xlabel("x")
-            ax.grid(True)
 
-    st.pyplot(fig)
+    plt.subplots_adjust(hspace=0.5)
 
-    st.subheader("Data")
-    st.dataframe(pd.DataFrame(out))
+    st.pyplot(fig, use_container_width=True)
+
+    st.subheader("Spatial data")
+    st.dataframe(df, use_container_width=True)
