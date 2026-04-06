@@ -80,7 +80,7 @@ def krogh_solver(Rtis, RR, GR, ve,
 
     def rhs(t, y):
         U = y.reshape(Nx,17)
-
+        U[0,0:7] = B_in
         dUdx = np.zeros_like(U)
         dUdx[1:] = (U[1:] - U[:-1]) / dx
 
@@ -154,11 +154,10 @@ def krogh_solver(Rtis, RR, GR, ve,
 
         dUdt=np.hstack([s_b,s_t])/c
         dUdt[0,0:7]=0
-
         return dUdt.flatten()
 
     def steady_event(t,y):
-        return np.max(np.abs(rhs(t,y))) - 1e-6
+        return np.max(np.abs(rhs(t,y))) - 1e-7
 
     steady_event.terminal=True
     steady_event.direction=-1
