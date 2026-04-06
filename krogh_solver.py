@@ -57,12 +57,13 @@ def krogh_solver(Rtis, RR, GR, ve,
 
     TBuf = 38.5/1000
     THb = 2.33*4/1000
+    H_b = startCO2 * 10**(-6.1) / startHCO3
 
     B_in = np.array([
         startO2/1000,
         startCO2/1000,
         startHCO3/1000,
-        H_b = startCO2 * 10**(-6.1) / startHCO3,
+        H_b,
         0, 0,
         startGlucose/1000
     ])
