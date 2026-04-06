@@ -58,7 +58,9 @@ def krogh_solver(Rtis, RR, GR, ve,
     TBuf = 38.5/1000
     THb = 2.33*4/1000
 
-    H_b = 10**(-7.4)
+    CO2_b = startCO2 / 1000
+    HCO3_b = startHCO3 / 1000
+    H_b = CO2_b * 10**(-6.1) / HCO3_b
 
     B_in = np.array([
         startO2/1000,
@@ -100,14 +102,14 @@ def krogh_solver(Rtis, RR, GR, ve,
         bufSlope = TBuf / (2.303 * H_b_safe)
 
         CAb=1000
-        rCO2_b = CAb*(kr*HCO3_b*H_b_safe - kh*CO2_b)
-        rHLac_b = kb*Lac_b*H_b_safe - kf*HLac_b
+        rCO2_b = CAb*(kr*HCO3_b*H_b - kh*CO2_b)
+        rHLac_b = kb*Lac_b*H_b - kf*HLac_b
 
-        rCO2_e = CA*(kr*HCO3_e*H_e_safe - kh*CO2_t)
-        rHLac_e = kb*Lac_e*H_e_safe - kf*HLac_t
+        rCO2_e = CA*(kr*HCO3_e*H_e - kh*CO2_t)
+        rHLac_e = kb*Lac_e*H_e - kf*HLac_t
 
-        rCO2_i = CA*(kr*HCO3_i*H_i_safe - kh*CO2_t)
-        rHLac_i = kb*Lac_i*H_i_safe - kf*HLac_t
+        rCO2_i = CA*(kr*HCO3_i*H_i - kh*CO2_t)
+        rHLac_i = kb*Lac_i*H_i - kf*HLac_t
 
         mmO2 = O2eff/(O2eff + KmO2)
         mmG  = Glueff/(Glueff + KgG)
