@@ -43,7 +43,9 @@ if st.button("Solve"):
 
     x = out["x"]
 
-    fig, axs = plt.subplots(3,4, figsize=(18,12))
+    df = pd.DataFrame(out)
+
+    fig, axs = plt.subplots(2,4, figsize=(18,8))
 
     # TOP ROW
     axs[0,0].plot(x,out["O2_b"],'r', label="Blood")
@@ -68,26 +70,26 @@ if st.button("Solve"):
 
     # BOTTOM ROW
     axs[1,0].plot(x,out["HCO3_b"],'r', label="Blood")
-    axs[1,0].plot(x,out["HCO3_i"],color='orange', label="Extracellular")
-    axs[1,0].plot(x,out["HCO3_e"],'b', label="Intracellular")
+    axs[1,0].plot(x,out["HCO3_i"],'b', label="Intracellular")
+    axs[1,0].plot(x,out["HCO3_e"],color='orange', label="Extracellular")
     axs[1,0].set_title("Bicarbonate (mM)")
     axs[1,0].legend()
 
     axs[1,1].plot(x,out["pHb"],'r', label="Blood")
-    axs[1,1].plot(x,out["pHi"],color='orange', label="Extracellular")
-    axs[1,1].plot(x,out["pHe"],'b', label="Intracellular")
+    axs[1,1].plot(x,out["pHi"],'b', label="Intracellular")
+    axs[1,1].plot(x,out["pHe"],color='orange', label="Extracellular")
     axs[1,1].set_title("pH")
     axs[1,1].legend()
 
     axs[1,2].plot(x,out["Lac_b"],'r', label="Blood")
-    axs[1,2].plot(x,out["Lac_i"],color='orange', label="Extracellular")
-    axs[1,2].plot(x,out["Lac_e"],'b', label="Intracellular")
+    axs[1,2].plot(x,out["Lac_i"],'b', label="Intracellular")
+    axs[1,2].plot(x,out["Lac_e"],color='orange', label="Extracellular")
     axs[1,2].set_title("Lactate (mM)")
     axs[1,2].legend()
 
     # pH vs O2
-    axs[1,3].plot(out["O2_t"],out["pHe"],color='orange', label="Extracellular")
-    axs[1,3].plot(out["O2_t"],out["pHi"],'b', label="Intracellular")
+    axs[1,3].plot(out["O2_t"],out["pHe"],color='orange', label="Intracellular")
+    axs[1,3].plot(out["O2_t"],out["pHi"],'b', label="Extracellular")
     axs[1,3].set_title("pH vs O2")
     axs[1,3].legend()
 
