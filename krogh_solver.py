@@ -145,6 +145,12 @@ def krogh_solver(Rtis, RR, GR, ve,
         c=np.ones_like(U)
         c[:,0]=1+dHb
         c[:,3]=1+bufSlope
+        c[:,9]  = ve
+        c[:,10] = ve
+        c[:,11] = ve
+        c[:,14] = vi
+        c[:,15] = vi * (1 + (30/1000) / (2.303 * H_i_safe))
+        c[:,16] = vi
 
         dUdt=np.hstack([s_b,s_t])/c
         dUdt[0,0:7]=0
