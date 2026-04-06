@@ -58,15 +58,11 @@ def krogh_solver(Rtis, RR, GR, ve,
     TBuf = 38.5/1000
     THb = 2.33*4/1000
 
-    CO2_b = startCO2 / 1000
-    HCO3_b = startHCO3 / 1000
-    H_b = CO2_b * 10**(-6.1) / HCO3_b
-
     B_in = np.array([
         startO2/1000,
         startCO2/1000,
         startHCO3/1000,
-        H_b,
+        H_b = startCO2 * 10**(-6.1) / startHCO3,
         0, 0,
         startGlucose/1000
     ])
@@ -74,10 +70,8 @@ def krogh_solver(Rtis, RR, GR, ve,
     U0 = np.zeros((Nx,17))
     U0[:,0:7] = B_in
     U0[:,7:14] = B_in
-    CO2_i = startCO2 / 1000
     H_i = 10**(-pHi0)
-    HCO3_i = CO2_i * 10**(pHi0 - 6.1)
-    U0[:,14] = HCO3_i
+    U0[:,14] = (startCO2 / 1000) * 10**(pHi0 - 6.1)
     U0[:,15] = H_i
     U0[:,16] = 0
 
